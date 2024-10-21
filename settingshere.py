@@ -5,6 +5,7 @@ import yt_dlp
 from dotenv import load_dotenv
 
 # Code Tutorial by Ethan | The Code Syndicate
+current_song = 0
 
 def run_bot():
     load_dotenv()
@@ -19,6 +20,27 @@ def run_bot():
     
     ffmpeg_options = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5','options': '-vn -filter:a "volume=0.25"'}
     
+    playlists = []          # playlist to manage
+    
+    def playlist_store(url, title):
+        playlists.append({
+            'url': url,
+            'title': title,
+        })
+        pass
+    
+    async def play_next(voice_client):
+        global current_song
+        if current_song < len(playlists):
+            song_data = playlists[current_song]
+            source = discord.FFmpegPCMAudio(song_data['url'], **ffmpeg_options)
+            
+            voice_client.play(source, after=lambda e: client.loop.create_task(play_next(voice_client)))
+            current_song += 1
+        else:
+            await voice_client.disconnect()
+            current_song = 0
+        
     @client.event
     async def on_ready():
         print(f'{client.user} is now jamming')
@@ -38,10 +60,18 @@ def run_bot():
                 loop = asyncio.get_event_loop()
                 data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
                 
-                song = data['url']  # song data here
-                player = discord.FFmpegPCMAudio(song, **ffmpeg_options) # play the song using the ffmpeg options
+                playlist_store(data['url'], data['title'])
                 
-                voice_clients[message.guild.id].play(player)
+                if len(playlists) > 0:
+                    song = playlists[current_song]['url']
+                    player = discord.FFmpegPCMAudio(song, **ffmpeg_options)
+                    
+                    voice_clients[message.guild.id].play(player, after=lambda e: client.loop.create_task(play_next(voice_clients[message.guild.id])))
+                
+                #song = data['url']
+                #player = discord.FFmpegPCMAudio(song, **ffmpeg_options) # play the song using the ffmpeg options
+                
+                v#oice_clients[message.guild.id].play(player)
             except Exception as e:
                 print(e)
                 
@@ -63,6 +93,12 @@ def run_bot():
                 await voice_clients[message.guild.id].disconnect()
             except Exception as e:
                 print(e)
+
+        if message.content.startswith("!skip"):
+            pass
+        
+        if message.content.startswith("!now"):
+            pass
     
     client.run(TOKEN)
     
