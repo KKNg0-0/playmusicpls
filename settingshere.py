@@ -21,14 +21,24 @@ def run_bot():
     ffmpeg_options = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5','options': '-vn -filter:a "volume=0.25"'}
     
     playlists = []          # playlist to manage
+    playlists_url = []      # playlist that stores only the url
     
     def playlist_store(url, title):
         playlists.append({
             'url': url,
             'title': title,
         })
-        pass
-    
+        
+    async def extract_song(url, voice_client):
+        global current_song
+        loop = asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        
+        playlist_store(data['url'], data['title'])
+        
+        if current_song == 0:
+            await play_next(voice_client)
+            
     async def play_next(voice_client):
         global current_song
         if current_song < len(playlists):
@@ -57,21 +67,13 @@ def run_bot():
             try:
                 url = message.content.split()[1]
                 
-                loop = asyncio.get_event_loop()
-                data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+                playlists_url.append(url)
                 
-                playlist_store(data['url'], data['title'])
-                
-                if len(playlists) > 0:
-                    song = playlists[current_song]['url']
-                    player = discord.FFmpegPCMAudio(song, **ffmpeg_options)
-                    
-                    voice_clients[message.guild.id].play(player, after=lambda e: client.loop.create_task(play_next(voice_clients[message.guild.id])))
-                
+                await extract_song(playlists_url[current_song], voice_clients[message.guild.id])
                 #song = data['url']
                 #player = discord.FFmpegPCMAudio(song, **ffmpeg_options) # play the song using the ffmpeg options
                 
-                v#oice_clients[message.guild.id].play(player)
+                #voice_clients[message.guild.id].play(player)
             except Exception as e:
                 print(e)
                 
