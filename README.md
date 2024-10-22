@@ -1,6 +1,15 @@
 ﻿# PlayMusicPls
 
-**NOTE**: I did not write the core(music player) part of the code myself
+**NOTE**: I only modified the original code, I do not actually know how the things work on a different level
+
+**You would need**:  
+
+                    pip install discord
+                    pip install asyncio
+                    pip install yt-dlp
+                    pip install dotenv
+                    
+**Note**: if pip install dotenv doesn't work, try pip install python-dotenv
 
 **Code Tutorial by Ethan | The Code Syndicate**
 
