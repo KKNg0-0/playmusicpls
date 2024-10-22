@@ -29,27 +29,33 @@ def run_bot():
             'title': title,
         })
         
-    async def extract_song(url, voice_client):
-        global current_song
+    async def extract_song(url):
         loop = asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
         
-        playlist_store(data['url'], data['title'])
+        return{
+            'url': data['url'],
+            'title': data['title']
+        }
         
-        if current_song == 0:
-            await play_next(voice_client)
+    def song_ends(error):
+        if error:
+            print("Error occured")
+        client.loop.create_task(play_next(voice_client))
             
     async def play_next(voice_client):
         global current_song
+        
         if current_song < len(playlists):
-            song_data = playlists[current_song]
-            source = discord.FFmpegPCMAudio(song_data['url'], **ffmpeg_options)
             
-            voice_client.play(source, after=lambda e: client.loop.create_task(play_next(voice_client)))
+            song = playlists[current_song]['url']
+            source = discord.FFmpegPCMAudio(song, **ffmpeg_options)
+            
+            voice_client.play(source, after=lambda e:client.loop.create_task(play_next(voice_client)))
             current_song += 1
         else:
             await voice_client.disconnect()
-            current_song = 0
+            current_song = 0 
         
     @client.event
     async def on_ready():
@@ -67,13 +73,18 @@ def run_bot():
             try:
                 url = message.content.split()[1]
                 
-                playlists_url.append(url)
-                
-                await extract_song(playlists_url[current_song], voice_clients[message.guild.id])
+                data = await extract_song(url)
+                playlists.append({
+                    'url': data['url'],
+                    'title': data['title'],
+                })
+                #await extract_song(playlists_url[current_song])
                 #song = data['url']
                 #player = discord.FFmpegPCMAudio(song, **ffmpeg_options) # play the song using the ffmpeg options
                 
                 #voice_clients[message.guild.id].play(player)
+                if not voice_clients[message.guild.id].is_playing():
+                   await play_next(voice_clients[message.guild.id])
             except Exception as e:
                 print(e)
                 
