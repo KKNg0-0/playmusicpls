@@ -55,7 +55,8 @@ def run_bot():
             current_song += 1
         else:
             await voice_client.disconnect()
-            current_song = 0 
+            current_song = 0
+            playlists.clear()
         
     @client.event
     async def on_ready():
