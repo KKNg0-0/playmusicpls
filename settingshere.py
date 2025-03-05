@@ -83,7 +83,7 @@ def run_bot():
                 })
                 
                 new_title = playlists[current_song]['title']
-                newmsg = str(new_title) + " added to the playlist"
+                newmsg = str(new_title) + " is added to the playlist"
                 await message.channel.send(newmsg)
                 
                 #await extract_song(playlists_url[current_song])
