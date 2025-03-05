@@ -51,6 +51,8 @@ def run_bot():
             song = playlists[current_song]['url']
             source = discord.FFmpegPCMAudio(song, **ffmpeg_options)
             
+            current_title = playlists[current_song]['title']    # get current song title
+            
             voice_client.play(source, after=lambda e:client.loop.create_task(play_next(voice_client)))
             current_song += 1
         else:
@@ -79,15 +81,43 @@ def run_bot():
                     'url': data['url'],
                     'title': data['title'],
                 })
+                
+                new_title = playlists[current_song]['title']
+                newmsg = str(new_title) + " added to the playlist"
+                await message.channel.send(newmsg)
+                
                 #await extract_song(playlists_url[current_song])
                 #song = data['url']
                 #player = discord.FFmpegPCMAudio(song, **ffmpeg_options) # play the song using the ffmpeg options
                 
                 #voice_clients[message.guild.id].play(player)
-                if not voice_clients[message.guild.id].is_playing():
+                if not voice_clients[message.guild.id].is_playing():    # if not playing, check/play next song
                    await play_next(voice_clients[message.guild.id])
             except Exception as e:
                 print(e)
+                
+        if message.content.startswith("!reply"):
+            try:
+                await message.reply("hello")
+            except Exception as e:
+                print(e)        
+                
+        if message.content.startswith("!sendhere"):
+            try:
+                await message.channel.send("hello2")
+            except Exception as e:
+                print(e)
+                
+        if message.content.startswith("!nowplaying"):
+            try:
+                if current_song < len(playlists):
+                    current_title = playlists[current_song-1]['title']
+                    newmsg = "I am playing " + current_title
+                    await message.reply(newmsg)
+                else:
+                    await message.reply("Search that urself nigga")
+            except Exception as e:
+                print(e)  
                 
         if message.content.startswith("!pause"):
             try:
@@ -103,6 +133,7 @@ def run_bot():
                       
         if message.content.startswith("!stop"):
             try:
+                await message.reply("Fk u nigga")
                 voice_clients[message.guild.id].stop()
                 await voice_clients[message.guild.id].disconnect()
             except Exception as e:
