@@ -22,3 +22,5 @@ other commands:
                 !stop: stop the player
                 
                 !resume: resume the paused player
+
+                !nowplaying: check which song is currently being played
