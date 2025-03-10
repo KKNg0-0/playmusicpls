@@ -115,11 +115,9 @@ def run_bot():
                     current_title = playlists[current_song-1]['title']
                     newmsg = "I am playing " + current_title
                     await message.reply(newmsg)
-                else:
-                    await message.reply("5 Ringgit for 1 search")
 
             except Exception as e:
-                print("search that urself bruh")
+                await message.reply("5 Ringgit for 1 search")
                 
         if message.content.startswith("!pause"):
             try:
