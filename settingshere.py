@@ -115,7 +115,7 @@ def run_bot():
                     newmsg = "I am playing " + current_title
                     await message.reply(newmsg)
                 else:
-                    await message.reply("Search that urself nigga")
+                    await message.reply("5 Ringgit for 1 search")
             except Exception as e:
                 print(e)  
                 
