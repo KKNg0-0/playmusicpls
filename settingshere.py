@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 # Code Tutorial by Ethan | The Code Syndicate
 current_song = 0
+#current_playlist = []
 
 def run_bot():
     load_dotenv()
@@ -116,8 +117,9 @@ def run_bot():
                     await message.reply(newmsg)
                 else:
                     await message.reply("5 Ringgit for 1 search")
+
             except Exception as e:
-                print(e)  
+                print("search that urself bruh")
                 
         if message.content.startswith("!pause"):
             try:
@@ -140,7 +142,12 @@ def run_bot():
                 print(e)
 
         if message.content.startswith("!skip"):
-            pass
+            try:
+                if voice_clients[message.guild.id].is_playing():    # if currently playing something, skip it
+                    current_song += 1   # maybe try skip with this
+                    await play_next(voice_clients[message.guild.id])
+            except Exception as e:
+                print("cant skip this nigga")
         
         if message.content.startswith("!now"):
             pass
