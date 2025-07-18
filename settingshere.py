@@ -67,10 +67,13 @@ def run_bot():
         
     @client.event
     async def on_message(message):
+        global current_song
+        
         if message.content.startswith("!play"):
             try:
                 voice_client = await message.author.voice.channel.connect() # join the voice channel of the author of the command
                 voice_clients[voice_client.guild.id] = voice_client
+                #print(f"current_song_value = {current_song}")
             except Exception as e:
                 print(e)
             
@@ -82,9 +85,9 @@ def run_bot():
                     'url': data['url'],
                     'title': data['title'],
                 })
-                
-                new_title = playlists[current_song]['title']
-                newmsg = str(new_title) + " is added to the playlist"
+
+                new_title = playlists[-1]['title']
+                newmsg = f"{new_title} is added to the playlist"
                 await message.channel.send(newmsg)
                 
                 #await extract_song(playlists_url[current_song])
