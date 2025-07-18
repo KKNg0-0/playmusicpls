@@ -114,11 +114,13 @@ def run_bot():
                 
         if message.content.startswith("!nowplaying"):
             try:
-                if current_song < len(playlists):
+                # current_song > 0 there's a song in the playlists
+                if playlists and current_song > 0:
                     current_title = playlists[current_song-1]['title']
                     newmsg = "I am playing " + current_title
                     await message.reply(newmsg)
-
+                else:
+                    await message.reply("Add something to the playlist first bruh")
             except Exception as e:
                 await message.reply("5 Ringgit for 1 search")
                 
