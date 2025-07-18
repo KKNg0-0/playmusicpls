@@ -136,7 +136,7 @@ def run_bot():
                       
         if message.content.startswith("!stop"):
             try:
-                await message.reply("Fk u nigga")
+                await message.reply("Pakkyu kneegar")
                 voice_clients[message.guild.id].stop()
                 await voice_clients[message.guild.id].disconnect()
             except Exception as e:
@@ -148,7 +148,7 @@ def run_bot():
                     current_song += 1   # maybe try skip with this
                     await play_next(voice_clients[message.guild.id])
             except Exception as e:
-                print("cant skip this nigga")
+                print("cant skip this kneegar")
         
         if message.content.startswith("!now"):
             pass
